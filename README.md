@@ -4,7 +4,7 @@
 
 [Your Name]
 
-Winter 202[Y]
+[QUARTER] 202[Y]
 
 ## Assignment Overview
 [Describe your understanding of the purpose and scope of the assignment 

@@ -91,13 +91,13 @@ public final class BookstoreMain {
         public Map<String, List<Item>> doInBackground() {
             final Map<String, List<Item>> inventories = new HashMap<>();
             final List<String> campusNames =
-                    InventoryLoader.readConfigurationFromFile(R.Strings.IO_FILE_LOCATION
-                            + R.Strings.IO_CONFIG_FILE);
+                    InventoryLoader.readConfigurationFromFile(R.SystemStrings.IO_FILE_LOCATION
+                            + R.SystemStrings.IO_CONFIG_FILE);
             for (final String campusName : campusNames) {
-                inventories.put(campusName, InventoryLoader.
-                        readItemsFromFile(R.Strings.IO_FILE_LOCATION
+                inventories.put(campusName, InventoryLoader
+                        .readItemsFromFile(R.SystemStrings.IO_FILE_LOCATION
                                 + campusName.toLowerCase(Locale.ENGLISH)
-                                + R.Strings.IO_FILE_EXTENSION));
+                                + R.SystemStrings.IO_FILE_EXTENSION));
             }
             return inventories;
         }
@@ -115,8 +115,5 @@ public final class BookstoreMain {
             }
         }
     }
-
-
-
 
 } // end class BookstoreMain

@@ -4,381 +4,275 @@
 
 package edu.uw.tcss.view;
 
-
-
 import edu.uw.tcss.model.Cart;
 import edu.uw.tcss.model.Item;
+import edu.uw.tcss.model.ItemOrder;
 import edu.uw.tcss.model.StoreCart;
-import edu.uw.tcss.model.StoreItemOrder;
 import edu.uw.tcss.res.R;
+import edu.uw.tcss.view.event.CampusSelectionListener;
+import edu.uw.tcss.view.event.CartControlListener;
+import edu.uw.tcss.view.event.ItemEvent;
+import edu.uw.tcss.view.event.ItemEventListener;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.awt.Toolkit;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.io.Serial;
-import java.text.NumberFormat;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import javax.swing.BorderFactory;
-import javax.swing.ButtonGroup;
+import java.util.Objects;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JRadioButton;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
 
 /**
  * BookstoreFrame provides the user interface for a UW Bookstore program.
- * 
+ * <p>
+ * This refactored version decomposes the monolithic frame into focused,
+ * reusable components following the Single Responsibility Principle.
+ * The frame acts as an orchestrator, composing smaller panels and
+ * coordinating their interactions through listener interfaces.
+ * <p>
+ * Architecture:
+ * - CampusSelectorPanel: campus radio buttons
+ * - CartSummaryPanel: total and item count display
+ * - ItemListPanel: grid of item rows with quantity fields
+ * - CartControlPanel: clear button and membership checkbox
+ * <p>
+ * The frame implements listener interfaces to handle events from
+ * the child components and coordinate updates across panels.
+ * <p>
+ * Event Handling:
+ * This version uses the sealed ItemEvent type system with pattern matching
+ * to handle item-related events. This provides type-safe, exhaustive event
+ * handling that the compiler can verify.
+ *
  * @author Marty Stepp
  * @author Daniel M. Zimmerman (Formatting and Comments)
  * @author Alan Fowler (Numerous changes to code and comments including use of BigDecimal)
  * @author Charles Bryan (Added radio buttons to change campus locations/changed name)
- * @version Autumn 2019
+ * @author Charles Bryan (Refactored into component-based architecture)
+ * @version Winter 2025
  */
-public final class BookstoreFrame extends JFrame {
+public final class BookstoreFrame extends JFrame
+        implements CampusSelectionListener,
+        CartControlListener,
+        ItemEventListener {
 
     /** The Serialization ID. */
     @Serial
     private static final long serialVersionUID = 505198377375189354L;
 
-    // constants to capture screen dimensions
     /** A ToolKit. */
     private static final Toolkit KIT = Toolkit.getDefaultToolkit();
-    
+
     /** The Dimension of the screen. */
     private static final Dimension SCREEN_SIZE = KIT.getScreenSize();
 
     /**
      * The shopping cart used by this GUI.
      */
-    private final StoreCart myItems;
-    
+    private final Cart myCart;
+
     /**
      * The map that stores each campus name and the campus's bookstore inventory.
      */
     private final Map<String, List<Item>> myCampusInventories;
 
     /**
-     * The map that stores each campus name and the campus's bookstore inventory.
+     * The currently selected campus.
      */
     private String myCurrentCampus;
-    
-    /**
-     * The text field used to display the total amount owed by the customer.
-     */
-    private final JTextField myTotal;
 
     /**
-     * The text field used to display the total amount owed by the customer.
+     * The cart summary panel (displays total and item count).
      */
-    private final JTextField myItemsInCart;
-    
-    /**
-     * The panel that holds the item descriptions. Needed to add and remove on
-     * the fly when the radio buttons change. 
-     */
-    private JPanel myItemsPanel;
+    private CartSummaryPanel myCartSummary;
 
     /**
-     * A List of the item text fields.
+     * The item list panel (displays all items with quantity fields).
      */
-    private final List<JTextField> myQuantities;
-    
+    private ItemListPanel myItemList;
+
     /**
      * Initializes the bookstore GUI.
-     * 
-     * @param theCampusInventories the list of items
-     * @param theCurrentCampus the campus that is originally selected when the app starts 
+     *
+     * @param campusInventories the map of campus names to item lists
+     * @param currentCampus the campus that is originally selected when the app starts
+     * @throws NullPointerException if any parameter is null
      */
-    public BookstoreFrame(final Map<String, List<Item>> theCampusInventories, 
-                         final String theCurrentCampus) {
-        // create frame and order list
-        super(); // No title on the JFrame. We can set this later.
-        
-        myItems = new StoreCart();
+    public BookstoreFrame(final Map<String, List<Item>> campusInventories,
+                          final String currentCampus) {
+        super();
 
-        // set up text field with order total
-        myTotal = new JTextField(R.Strings.BF_TEXTFIELD_TOTAL,
-                                 R.Dimensions.BF_TEXTFIELD_TOTAL);
+        myCart = new StoreCart();
+        myCampusInventories = Objects.requireNonNull(campusInventories,
+                "Campus inventories cannot be null");
+        myCurrentCampus = Objects.requireNonNull(currentCampus,
+                "Current campus cannot be null");
 
-        // set up text field with order total
-        myItemsInCart = new JTextField(R.Strings.BF_TEXTFIELD_ITEMS_IN_CART,
-                R.Dimensions.BF_TEXTFIELD_ITEM_COUNT);
-        
-        myQuantities = new LinkedList<>();
-        
-        myCampusInventories = theCampusInventories;
-        myCurrentCampus = theCurrentCampus;
-        
         setupGUI();
-    }    
+    }
 
     /**
-     * Setup the various parts of the GUI.
-     * 
+     * Sets up the various parts of the GUI.
      */
     private void setupGUI() {
-        // hide the default JFrame icon
-        //final Image icon = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB_PRE);
-        
-        
-        // replace the default JFrame icon
-        final ImageIcon img = 
-                        new ImageIcon(R.Strings.IO_FILE_LOCATION + R.Strings.IO_ICON_FILE);
+        // Set up frame icon
+        final ImageIcon img = new ImageIcon(
+                R.SystemStrings.IO_FILE_LOCATION + R.SystemStrings.IO_ICON_FILE);
         setIconImage(img.getImage());
-        
-        setTitle(R.Strings.BF_FRAME_TITLE);
-        
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        
-        add(makeTotalAndCountPanel(), BorderLayout.NORTH);
-        
-        myItemsPanel = makeItemsPanel(myCampusInventories.get(myCurrentCampus)); 
-        add(myItemsPanel, BorderLayout.CENTER);
-        
-        add(makeCheckBoxPanel(), BorderLayout.SOUTH);
 
-        // adjust size to just fit
+        setTitle(R.UIStrings.BF_FRAME_TITLE);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        // Create header panel (campus selector plus cart summary)
+        final JPanel headerPanel = createHeaderPanel();
+        add(headerPanel, BorderLayout.NORTH);
+
+        // Create item list panel
+        myItemList = new ItemListPanel(
+                myCampusInventories.get(myCurrentCampus),
+                this);
+        add(myItemList, BorderLayout.CENTER);
+
+        // Create footer panel (cart controls)
+        final CartControlPanel cartControls = new CartControlPanel(this);
+        add(cartControls, BorderLayout.SOUTH);
+
+        // Adjust size to just fit
         pack();
-        
-        // make the GUI so that it cannot be resized by the user dragging a corner
+
+        // Make the GUI so that it cannot be resized by the user dragging a corner
         setResizable(false);
-        
-        // position the frame in the center of the screen
+
+        // Position the frame in the center of the screen
         setLocation(SCREEN_SIZE.width / 2 - getWidth() / 2,
-                    SCREEN_SIZE.height / 2 - getHeight() / 2);
+                SCREEN_SIZE.height / 2 - getHeight() / 2);
         setVisible(true);
     }
-    
-    /**
-     * Creates the panel to hold the campus location radio buttons. 
-     * 
-     * @return The created JPanel
-     */
-    private JPanel makeCampusPanel() {
-        final JPanel p = new JPanel();
-        p.setBackground(R.Colors.HEADER_FOOTER_BG);
-        
-        final ButtonGroup g = new ButtonGroup();
-        for (final Object campus : myCampusInventories.keySet()) {
-            final JRadioButton rb = new JRadioButton(campus.toString());
-            rb.setForeground(R.Colors.HEADER_FOOTER_TEXT);
-            rb.setBackground(R.Colors.HEADER_FOOTER_BG);
-            rb.setSelected(campus.equals(myCurrentCampus));
-            g.add(rb);
-            p.add(rb);
-
-            //noinspection OverlyLongLambda
-            rb.addActionListener(ae -> {
-                    myCurrentCampus = rb.getText();
-                    
-                    //remove the old panel and add the new one
-                    remove(myItemsPanel);
-                    myItemsPanel = makeItemsPanel(myCampusInventories.get(myCurrentCampus));
-                    add(myItemsPanel, BorderLayout.CENTER);
-                    
-                    //clear previous data from the ShppingCart and
-                    //update the total in the GUI
-                    myItems.clear();
-                    updateTotal();
-                    
-                    //redraw the UI with the new panel
-                    pack();
-                    revalidate();
-                } 
-            );
-        } 
-        return p;
-    }
 
     /**
-     * Creates a panel to hold the total.
-     * 
-     * @return The created panel
-     */
-    private JPanel makeTotalAndCountPanel() {
-        
-        final JPanel p = new JPanel(new BorderLayout());
-        p.add(makeCampusPanel(), BorderLayout.NORTH);
-        p.add(makeTotalPanel(), BorderLayout.CENTER);
-        p.add(makeItemCountPanel(), BorderLayout.SOUTH);
-        
-        return p;
-    }
-
-    /**
-     * Creates a panel to hold the total.
+     * Creates the header panel containing campus selector and cart summary.
      *
-     * @return The created panel
+     * @return the header panel
      */
-    private JPanel makeTotalPanel() {
-        // tweak the text field so that users can't edit it, and set
-        // its color appropriately
+    private JPanel createHeaderPanel() {
+        final JPanel panel = new JPanel(new BorderLayout());
 
-        myTotal.setEditable(false);
-        myTotal.setEnabled(false);
-        myTotal.setDisabledTextColor(R.Colors.CONTENT_TEXT);
+        // Create campus selector panel
+        final CampusSelectorPanel campusSelector = new CampusSelectorPanel(
+                myCampusInventories.keySet(),
+                myCurrentCampus,
+                this);
+        panel.add(campusSelector, BorderLayout.NORTH);
 
-        // create the panel, and its label
+        // Create cart summary panel
+        myCartSummary = new CartSummaryPanel();
+        panel.add(myCartSummary, BorderLayout.CENTER);
 
-        final JPanel totalPanel = new JPanel();
-        totalPanel.setBackground(R.Colors.HEADER_FOOTER_BG);
-        final JLabel l = new JLabel(R.Strings.BF_LABEL_TOTAL);
-        l.setForeground(R.Colors.HEADER_FOOTER_TEXT);
-        totalPanel.add(l);
-        totalPanel.add(myTotal);
-
-        return totalPanel;
+        return panel;
     }
 
-
-
     /**
-     * Creates a panel to hold the item count.
+     * Handles campus selection events from the CampusSelectorPanel.
+     * <p>
+     * When a different campus is selected, this method:
+     * - Updates the current campus
+     * - Rebuilds the item list with the new inventory
+     * - Clears the shopping cart
+     * - Updates the display
+     * - Refreshes the UI layout
      *
-     * @return The created panel
+     * @param campusName the name of the newly selected campus
      */
-    private JPanel makeItemCountPanel() {
-        // tweak the text field so that users can't edit it, and set
-        // its color appropriately
+    @Override
+    public void onCampusSelected(final String campusName) {
+        myCurrentCampus = campusName;
 
-        myItemsInCart.setEditable(false);
-        myItemsInCart.setEnabled(false);
-        myItemsInCart.setDisabledTextColor(R.Colors.CONTENT_TEXT);
+        // Rebuild item list panel with new campus inventory
+        remove(myItemList);
+        myItemList = new ItemListPanel(
+                myCampusInventories.get(myCurrentCampus),
+                this);
+        add(myItemList, BorderLayout.CENTER);
 
-        // create the panel, and its label
+        // Clear shopping cart and update display
+        myCart.clear();
+        updateDisplay();
 
-
-        final JPanel itemsCountPanel = new JPanel();
-        itemsCountPanel.setBackground(R.Colors.HEADER_FOOTER_BG);
-        final JLabel label = new JLabel(R.Strings.BF_LABEL_ITEM_IN_CART);
-        label.setForeground(R.Colors.HEADER_FOOTER_TEXT);
-        itemsCountPanel.add(label);
-        itemsCountPanel.add(myItemsInCart);
-
-        return itemsCountPanel;
+        // Refresh UI layout
+        pack();
+        revalidate();
     }
 
     /**
-     * Creates a panel to hold the specified list of items.
-     * 
-     * @param theItems The items
-     * @return The created panel
+     * Handles clear button events from the CartControlPanel.
+     * <p>
+     * This is a controller-initiated action (downstream), so we:
+     * <ol>
+     *   <li>Clear the cart directly (we know what we're doing)</li>
+     *   <li>Tell the UI to reset (silent, no events fired back)</li>
+     *   <li>Update the display</li>
+     * </ol>
+     * <p>
+     * Note: {@link ItemListPanel#clearAllQuantities()} does NOT fire events
+     * because this is a controller-initiated change. Events are only needed
+     * for user-initiated changes that the controller doesn't already know about.
+     *
+     * @see ItemListPanel#clearAllQuantities()
      */
-    private JPanel makeItemsPanel(final List<Item> theItems) {
-        final JPanel p = new JPanel(new GridLayout(theItems.size(),
-                                                   R.Dimensions.BF_ITEMS_COLS));
-        p.setBorder(BorderFactory.
-                    createEmptyBorder(R.Dimensions.V_PADDING, R.Dimensions.H_PADDING,
-                                      R.Dimensions.V_PADDING, R.Dimensions.H_PADDING));
-        p.setBackground(R.Colors.CONTENT_BG);
-        for (final Item item : theItems) {
-            addItem(item, p);
+    @Override
+    public void onClearRequested() {
+        myCart.clear();
+        myItemList.clearAllQuantities();
+        updateDisplay();
+    }
+
+    /**
+     * Handles membership checkbox events from the CartControlPanel.
+     * <p>
+     * Updates the cart's membership status and recalculates the total.
+     *
+     * @param hasMembership true if membership is enabled, false otherwise
+     */
+    @Override
+    public void onMembershipChanged(final boolean hasMembership) {
+        myCart.setMembership(hasMembership);
+        updateDisplay();
+    }
+
+    /**
+     * Handles item events from ItemRowPanel instances.
+     * <p>
+     * Uses pattern matching to process different event types. The sealed
+     * interface ensures exhaustive handling - the compiler verifies that
+     * all possible event types are handled.
+     * <p>
+     * Currently handles:
+     * - QuantityChanged: Updates the cart and refreshes the display
+     *
+     * @param event the item event that occurred
+     */
+    @Override
+    public void onItemEvent(final ItemEvent event) {
+        // Pattern matching on sealed type - compiler ensures exhaustiveness
+        switch (event) {
+            case ItemEvent.QuantityChanged(final Item item, final int quantity) -> {
+                myCart.add(new ItemOrder(item, quantity));
+                updateDisplay();
+            }
+            // No default needed - sealed interface ensures all cases are covered
+            // If new event types are added, compiler will force us to handle them
         }
-
-        return p;
     }
 
     /**
-     * Creates and returns the checkbox panel.
-     * 
-     * @return the checkbox panel
+     * Updates the cart summary display with current cart information.
+     * <p>
+     * This method is called whenever the cart contents change to refresh
+     * the displayed total and item counts.
      */
-    private JPanel makeCheckBoxPanel() {
-        final JPanel p = new JPanel();
-        p.setBackground(R.Colors.HEADER_FOOTER_BG);
-        
-        final JButton clearButton = new JButton(R.Strings.BF_BUTTON_CLEAR);
-        //noinspection OverlyLongLambda
-        clearButton.addActionListener(theEvent -> {
-            myItems.clear();
-            for (final JTextField field : myQuantities) {
-                field.setText("");
-            }
-            updateTotal();
-        });
-        p.add(clearButton);
-        
-        final JCheckBox cb = new JCheckBox(R.Strings.BF_CHECKBOX_MEMBER);
-        cb.setForeground(R.Colors.HEADER_FOOTER_TEXT);
-        cb.setBackground(R.Colors.HEADER_FOOTER_BG);
-        cb.addActionListener(theEvent -> {
-            myItems.setMembership(cb.isSelected());
-            updateTotal();
-        });
-        p.add(cb);
-        
-        return p;
-    }
-
-    /**
-     * Adds the specified product to the specified panel.
-     * 
-     * @param theItem The product to add.
-     * @param thePanel The panel to add the product to.
-     */
-    private void addItem(final Item theItem, final JPanel thePanel) {
-        final JPanel sub = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        sub.setBackground(R.Colors.CONTENT_BG);
-        final JTextField quantity = new JTextField(R.Dimensions.BF_TEXTFIELD_QUANITITY);
-        myQuantities.add(quantity);
-        quantity.setHorizontalAlignment(SwingConstants.CENTER);
-        quantity.addActionListener(theEvent -> quantity.transferFocus());
-        quantity.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusLost(final FocusEvent theEvent) {
-                updateItem(theItem, quantity);
-            }
-        });
-        sub.add(quantity);
-        final JLabel l = new JLabel(theItem.toString());
-        l.setForeground(R.Colors.HEADER_FOOTER_BG);
-        sub.add(l);
-        thePanel.add(sub);
-    }
-
-    /**
-     * Updates the set of items by changing the quantity of the specified
-     * product to the specified quantity.
-     * 
-     * @param theItem The product to update.
-     * @param theQuantity The new quantity.
-     */
-    private void updateItem(final Item theItem, final JTextField theQuantity) {
-        final String text = theQuantity.getText().trim();
-        int number;
-        try {
-            number = Integer.parseInt(text);
-            if (number < 0) {
-                // disallow negative numbers
-                throw new NumberFormatException();
-            }
-        } catch (final NumberFormatException e) {
-            number = 0;
-            theQuantity.setText("");
-        }
-        myItems.add(new StoreItemOrder(theItem, number));
-        updateTotal();
-    }
-
-    /**
-     * Updates the total displayed in the window.
-     */
-    private void updateTotal() {
-        final double total = myItems.calculateTotal().doubleValue();
-        myTotal.setText(NumberFormat.getCurrencyInstance().format(total));
-        final Cart.CartSize count = myItems.getCartSize();
-        myItemsInCart.setText(count.itemCount() + "/" + count.itemOrderCount());
+    private void updateDisplay() {
+        myCartSummary.updateSummary(myCart.calculateTotal(), myCart.getCartSize());
     }
 }
-
-// end of class BookstoreFrame

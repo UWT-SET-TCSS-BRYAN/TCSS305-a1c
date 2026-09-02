@@ -1,7 +1,7 @@
 /*
  * TCSS 305 - Assignment 1b
  *
- * This is an example test class demonstrating JUnit 5 testing patterns.
+ * This is an example test class demonstrating JUnit 6 testing patterns.
  * Study this file carefully before writing your own tests.
  */
 

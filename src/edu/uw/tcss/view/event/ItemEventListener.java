@@ -26,7 +26,7 @@ package edu.uw.tcss.view.event;
  * </pre>
  *
  * @author Charles Bryan
- * @version Winter 2025
+ * @version Autumn 2026
  */
 @FunctionalInterface
 public interface ItemEventListener {

@@ -42,7 +42,7 @@ import javax.swing.JPanel;
  * </ul>
  *
  * @author Charles Bryan
- * @version Winter 2025
+ * @version Autumn 2026
  * @see CartControlListener
  */
 public final class CartControlPanel extends JPanel {

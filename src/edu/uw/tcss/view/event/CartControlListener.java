@@ -12,7 +12,7 @@ package edu.uw.tcss.view.event;
  * or the membership checkbox state changes.
  *
  * @author Charles Bryan
- * @version Winter 2025
+ * @version Autumn 2026
  */
 public interface CartControlListener {
 

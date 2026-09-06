@@ -28,7 +28,7 @@ import javax.swing.SwingWorker;
  * @author Alan Fowler (Numerous changes including use of BigDecimal and file input)
  * @author Charles Bryan (Added multiple file loading options/changed name)
  * @author Charles Bryan (Removed credentialling sytsem)
- * @version January 2025
+ * @version Autumn 2026
  */
 
 public final class BookstoreMain {
@@ -55,9 +55,9 @@ public final class BookstoreMain {
     /**
      * The main() method - displays and runs the bookstore GUI.
      *
-     * @param theArgs Command line arguments, ignored by this program.
+     * @param args Command line arguments, ignored by this program.
      */
-    public static void main(final String... theArgs) {
+    public static void main(final String... args) {
 
         EventQueue.invokeLater(new LoadInventoryWorker());
 

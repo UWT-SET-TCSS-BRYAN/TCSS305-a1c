@@ -20,7 +20,7 @@ import java.util.Objects;
  * @param item the Item being ordered
  * @param quantity the quantity of the item being ordered
  * @author Charles Bryan
- * @version Winter 2025
+ * @version Autumn 2026
  */
 public record ItemOrder(Item item, int quantity) {
 

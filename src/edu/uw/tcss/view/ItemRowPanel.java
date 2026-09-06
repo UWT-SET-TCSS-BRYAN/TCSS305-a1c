@@ -56,7 +56,7 @@ import javax.swing.SwingConstants;
  * </ul>
  *
  * @author Charles Bryan
- * @version Winter 2025
+ * @version Autumn 2026
  * @see ItemEvent
  * @see ItemEventListener
  */

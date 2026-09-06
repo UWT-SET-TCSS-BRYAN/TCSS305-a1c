@@ -13,7 +13,7 @@ import java.awt.Color;
  * class they are associated with (e.g., BF = BookstoreFrame).
  *
  * @author Charles Bryan
- * @version Winter 2025
+ * @version Autumn 2026
  */
 @SuppressWarnings("NewClassNamingConvention")
 public final class R {
@@ -26,7 +26,7 @@ public final class R {
      * Resource enum for array index values in the Items File.
      *
      * @author Charles Bryan
-     * @version Winter 2025
+     * @version Autumn 2026
      */
     public enum ItemsFile {
 
@@ -52,7 +52,7 @@ public final class R {
      * UW Web Color Palette</a>.
      *
      * @author Charles Bryan
-     * @version Winter 2025
+     * @version Autumn 2026
      */
     public static final class Colors {
 
@@ -77,7 +77,7 @@ public final class R {
      * Resource class for UI dimensions.
      *
      * @author Charles Bryan
-     * @version Winter 2025
+     * @version Autumn 2026
      */
     public static final class Dimensions {
 
@@ -112,7 +112,7 @@ public final class R {
      * for internationalization (i18n).
      *
      * @author Charles Bryan
-     * @version Winter 2025
+     * @version Autumn 2026
      */
     public static final class SystemStrings {
 
@@ -150,7 +150,7 @@ public final class R {
      * Naming convention: CLASS_COMPONENT_DESCRIPTION (e.g., BF = BookstoreFrame).
      *
      * @author Charles Bryan
-     * @version Winter 2025
+     * @version Autumn 2026
      */
     public static final class UIStrings {
 

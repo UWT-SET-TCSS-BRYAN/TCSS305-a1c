@@ -25,7 +25,7 @@ import java.util.Objects;
  * additional state.
  *
  * @author Charles Bryan
- * @version Winter 2025
+ * @version Autumn 2026
  */
 public sealed interface ItemEvent permits ItemEvent.QuantityChanged {
 

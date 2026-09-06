@@ -30,7 +30,7 @@ import java.util.Scanner;
  * based on the input data, hiding the concrete class selection from callers.
  *
  * @author Charles Bryan
- * @version Winter 2025
+ * @version Autumn 2026
  */
 public final class InventoryLoader {
 

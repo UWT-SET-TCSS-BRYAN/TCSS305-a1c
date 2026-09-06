@@ -51,7 +51,7 @@ import javax.swing.JPanel;
  * @author Alan Fowler (Numerous changes to code and comments including use of BigDecimal)
  * @author Charles Bryan (Added radio buttons to change campus locations/changed name)
  * @author Charles Bryan (Refactored into component-based architecture)
- * @version Winter 2025
+ * @version Autumn 2026
  */
 public final class BookstoreFrame extends JFrame
         implements CampusSelectionListener,

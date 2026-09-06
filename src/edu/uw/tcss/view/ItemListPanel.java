@@ -34,7 +34,7 @@ import javax.swing.JPanel;
  * - Pass ItemEventListener to child panels for event propagation
  *
  * @author Charles Bryan
- * @version Winter 2025
+ * @version Autumn 2026
  */
 public final class ItemListPanel extends JPanel {
 

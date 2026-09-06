@@ -47,7 +47,7 @@ import javax.swing.JTextField;
  * </ul>
  *
  * @author Charles Bryan
- * @version Winter 2025
+ * @version Autumn 2026
  */
 public final class CartSummaryPanel extends JPanel {
 

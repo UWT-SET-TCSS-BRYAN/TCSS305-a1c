@@ -4,7 +4,7 @@
 
 [Your Name]
 
-[Quarter and Year: ex: Winter 2026]
+[Quarter and Year: ex: Autumn 2026]
 
 ## Assignment Overview
 [Describe your understanding of the purpose and scope of the assignment

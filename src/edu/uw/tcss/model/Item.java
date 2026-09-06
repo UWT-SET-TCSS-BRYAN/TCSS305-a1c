@@ -16,7 +16,7 @@ import java.math.BigDecimal;
  * unexpected extensions.
  *
  * @author Charles Bryan
- * @version Winter 2025
+ * @version Autumn 2026
  */
 public sealed interface Item permits AbstractItem {
 

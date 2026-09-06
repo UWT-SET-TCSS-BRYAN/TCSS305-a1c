@@ -1,11 +1,11 @@
 # TCSS 305 – Assignment 1C: Bookstore Implementation
 
-**UW Tacoma | Winter 2026**
+**UW Tacoma | Autumn 2026**
 
 ## Assignment Instructions
 
 Full instructions available at:
-https://cfb3.github.io/TCSS305-GUIDES/assignments/a1c/
+https://cfb3.github.io/TCSS305-26-AUTUMN/assignments/a1c/
 
 ## Project Structure
 

@@ -25,6 +25,11 @@ import java.math.BigDecimal;
 //       getFormattedDescription() methods in the subclasses can use it:
 //       CURRENCY_FORMAT.format(getPrice()) returns "$2.00".
 //
+//   public abstract String toString()
+//       Declared abstract here, so the compiler requires each subclass to
+//       write its own debug string. AbstractItem does not know what fields
+//       its subclasses add.
+//
 // Every member above needs its own Javadoc comment before this class will pass
 // Checkstyle. See Requirement 1 of the assignment for the full specification.
 public abstract sealed class AbstractItem

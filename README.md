@@ -32,10 +32,8 @@ test/edu/uw/tcss/model/
 └── [your tests from 1b]        (copy here)
 
 files/                          (inventory data - provided)
-
-project root/
-├── executive-summary.md        (your submission notes)
-└── README.md                   (this file)
+executive-summary.md            (your submission notes)
+README.md                       (this file)
 ```
 
 ## Getting Started

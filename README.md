@@ -58,6 +58,10 @@ README.md                       (this file)
 
 ## What to Submit
 
+Do all of your work on a `dev` branch, not on `main`. Create it before you write
+any code. To submit, push `dev`, open a pull request into `main`, and merge it.
+Work pushed straight to `main` with no branch or pull request is incomplete.
+
 - Completed `AbstractItem.java`
 - Your implementations: `StoreItem.java`, `StoreBulkItem.java`, `StoreCart.java`
 - Your test files from 1b (updated if needed)
